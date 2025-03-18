@@ -1,0 +1,19 @@
+{% extends 'admin/base.html' %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  html[data-theme="light"], :root {
+  --primary: #1a002d;
+  --secondary: #2c0059;
+  --selected-row: #600062;
+  --header-color: #ff00cc;
+}
+html[data-theme="dark"], :root {
+  --primary: #1a002d;
+  --secondary: #2c0059;
+  --selected-row: #600062;
+  --header-color: #ff00cc;
+}
+</style>
+{% endblock %}
