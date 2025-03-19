@@ -1,0 +1,16 @@
+asgiref==3.8.1
+black==24.3.0
+click==8.1.7
+colorama==0.4.6
+dj-database-url==2.1.0
+django-cors-headers==4.3.1
+django-ses==3.5.2
+django-storages==1.14.2
+Django==5.0.3
+djoser==2.2.2
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
+social-auth-app-django==5.4.0
+sqlparse==0.4.4
+tzdata==2024.1
