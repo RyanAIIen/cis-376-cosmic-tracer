@@ -1,0 +1,17 @@
+.DS_Store
+.pnp.js
+.vercel
+.yarn/install-state.gz
+*.env
+*.pem
+*.tsbuildinfo
+/.next/
+/.pnp
+/build
+/coverage
+/node_modules
+/out/
+next-env.d.ts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
