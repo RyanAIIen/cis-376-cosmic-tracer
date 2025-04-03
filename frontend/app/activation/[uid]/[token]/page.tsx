@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { use, useEffect } from 'react';
 
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation';
@@ -8,20 +8,19 @@ import { toast } from 'react-toastify';
 
 import { useActivationMutation } from '@/redux/features/authApiSlice';
 
-interface PageProps {
-  params: {
-    uid: string;
-    token: string;
-  };
-}
+type PageParams = Promise<{
+  uid: string;
+  token: string;
+}>;
 
-export default function Page({ params }: PageProps) {
+export default function Page({ params }: { params: PageParams }) {
+  const { uid, token } = use(params);
+
   const router = useRouter();
 
   const [activation] = useActivationMutation();
 
   useEffect(() => {
-    const { uid, token } = params;
     activation({ uid, token })
       .unwrap()
       .then(() => {
