@@ -55,7 +55,7 @@ const userMenu = [
 ];
 
 const Logo = ({ sx }: { sx: LinkProps['sx'] }) => (
-  <Link href='/' sx={sx}>
+  <Link href='/dashboard' sx={sx}>
     <Box display='flex' flexGrow={1} gap={1} alignItems='center'>
       <Image
         src='/cosmic-tracer-logo.png'
