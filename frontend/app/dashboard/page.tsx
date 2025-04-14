@@ -340,7 +340,7 @@ export default function Page() {
         
         {/* Footer */}
         <Typography variant="caption" color="#777" sx={{ textAlign: 'center', display: 'block', mt: 4 }}>
-          © 2023 Cosmic Tracer - Created as part of CIS-376
+          © 2025 Cosmic Tracer - Created as part of CIS-376
         </Typography>
       </Container>
     </RequireAuth>

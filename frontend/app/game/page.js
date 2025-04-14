@@ -419,7 +419,7 @@ export default function GamePage() {
       
       {/* Footer */}
       <Typography variant="caption" color="#777" sx={{ mt: 2 }}>
-        © 2023 Cosmic Snake Game - Created as part of CIS-376
+        © 2025 Cosmic Snake Game - Created as part of CIS-376
       </Typography>
     </Box>
   );
