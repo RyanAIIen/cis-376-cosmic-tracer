@@ -7,6 +7,7 @@ import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
@@ -41,6 +42,11 @@ const guestNavItems = [
 
 const authenticatedNavItems = [
   { name: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
+];
+
+// Always visible navigation items regardless of auth status
+const alwaysVisibleNavItems = [
+  { name: 'Play Game', href: '/game', icon: <SportsEsportsIcon /> },
 ];
 
 const userMenu = [
@@ -84,8 +90,8 @@ export default function Navigation() {
   const navItems = isLoading
     ? []
     : isAuthenticated
-      ? authenticatedNavItems
-      : guestNavItems;
+      ? [...authenticatedNavItems, ...alwaysVisibleNavItems]
+      : [...guestNavItems, ...alwaysVisibleNavItems];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
