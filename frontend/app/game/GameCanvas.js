@@ -78,24 +78,28 @@ export default function GameCanvas({
       switch (e.key) {
         case 'w':
         case 'ArrowUp':
+          e.preventDefault(); // Prevent page scrolling
           if (directionRef.current !== 'down') {
             nextDirectionRef.current = 'up';
           }
           break;
         case 's':
         case 'ArrowDown':
+          e.preventDefault(); // Prevent page scrolling
           if (directionRef.current !== 'up') {
             nextDirectionRef.current = 'down';
           }
           break;
         case 'a':
         case 'ArrowLeft':
+          e.preventDefault(); // Prevent page scrolling
           if (directionRef.current !== 'right') {
             nextDirectionRef.current = 'left';
           }
           break;
         case 'd':
         case 'ArrowRight':
+          e.preventDefault(); // Prevent page scrolling
           if (directionRef.current !== 'left') {
             nextDirectionRef.current = 'right';
           }
