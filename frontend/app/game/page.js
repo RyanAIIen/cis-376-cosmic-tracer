@@ -18,7 +18,10 @@ export default function GamePage() {
   const [gameOver, setGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  
+  const [showScoreDoubler, setShowScoreDoubler] = useState(false);
+    const [isDoubleScoreActive, setIsDoubleScoreActive] = useState(false);
+
+
   // Check for client-side rendering and load high score
   useEffect(() => {
     setIsClient(true);
@@ -112,6 +115,13 @@ export default function GamePage() {
             COSMIC SNAKE
           </Typography>
         </Box>
+              {showScoreDoubler && (
+                  <Box sx={{ mb: 2 }}>
+                      <Typography variant="h6" color="#ffd700" sx={{ fontWeight: 'bold' }}>
+                          💥 Score Doubler Active!
+                      </Typography>
+                  </Box>
+              )}
 
         <Grid container alignItems="center" spacing={2}>
           <Grid item xs={4}>
@@ -246,6 +256,8 @@ export default function GamePage() {
             setGameOver={handleGameOver}
             score={score}
             resetGame={startGame}
+            setIsDoubleScoreActive={setIsDoubleScoreActive}
+            exposeScoreDoubler={(active) => setShowScoreDoubler(active)}
           />
         )}
         
