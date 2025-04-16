@@ -18,8 +18,8 @@ export default function GamePage() {
   const [gameOver, setGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [showScoreDoubler, setShowScoreDoubler] = useState(false);
-  const [isDoubleScoreActive, setIsDoubleScoreActive] = useState(false);
+  const [isTimeWarpActive, setIsTimeWarpActive] = useState(false);
+  const [showTimeWarpWarning, setShowTimeWarpWarning] = useState(false);
   const [gameTime, setGameTime] = useState(0); // Timer in seconds
   const timerRef = useRef(null); // To hold the timer interval
   
@@ -54,6 +54,45 @@ export default function GamePage() {
     };
   }, [gameStarted, isPaused, gameOver]);
   
+  // Time warp mechanic (slows down the game)
+  useEffect(() => {
+    // If game is running, check for time-based events
+    if (gameStarted && !isPaused && !gameOver) {
+      // Time warp cycles every minute - warning appears 2 seconds before
+      const timeInCycle = gameTime % 60; // Get position within a 60-second cycle
+      
+      // Show warning 2 seconds before time warp activates (at 58 seconds in each cycle)
+      if (timeInCycle === 58) {
+        setShowTimeWarpWarning(true);
+        console.log("⚠️ TIME WARP APPROACHING! ⚠️");
+      }
+      
+      // Activate time warp at start of each cycle (0, 60, 120, etc. seconds)
+      if (timeInCycle === 0 && gameTime > 0) { // Skip the very first second of the game
+        setShowTimeWarpWarning(false);
+        setIsTimeWarpActive(true);
+        console.log(`🌀 TIME WARP ACTIVATED at ${gameTime}s! 🌀 Time has slowed down!`);
+      }
+      
+      // Deactivate time warp after 15 seconds in each cycle
+      if (timeInCycle === 15) {
+        setIsTimeWarpActive(false);
+        console.log(`TIME WARP DEACTIVATED at ${gameTime}s! Normal time flow restored.`);
+      }
+      
+      // Log time warp status every 10 seconds for debugging
+      if (gameTime % 10 === 0 && gameTime > 0) {
+        console.log(`Time: ${gameTime}s - Time warp status: ${isTimeWarpActive ? 'ACTIVE' : 'INACTIVE'}`);
+      }
+    }
+    
+    // Reset time warp state when game resets
+    if (!gameStarted || gameOver) {
+      setIsTimeWarpActive(false);
+      setShowTimeWarpWarning(false);
+    }
+  }, [gameTime, gameStarted, isPaused, gameOver]);
+  
   // Format time for display (mm:ss)
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
@@ -78,6 +117,8 @@ export default function GamePage() {
     setGameStarted(true);
     setGameOver(false);
     setIsPaused(false);
+    setIsTimeWarpActive(false); // Reset time warp
+    setShowTimeWarpWarning(false); // Reset warning
   };
   
   // Reset the game
@@ -89,6 +130,8 @@ export default function GamePage() {
     setScore(0);
     setGameTime(0); // Reset timer
     setIsPaused(false);
+    setIsTimeWarpActive(false); // Reset time warp
+    setShowTimeWarpWarning(false); // Reset warning
   };
   
   // Toggle pause
@@ -106,7 +149,7 @@ export default function GamePage() {
   return (
     <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', bgcolor: '#050518', minHeight: '100vh' }}>
       <Typography variant="h3" gutterBottom color="#30cfd0" sx={{ fontWeight: 'bold', mb: 3 }}>
-        COSMIC SNAKE
+        COSMIC TRACER
       </Typography>
       
       {/* Game Stats and Controls Dashboard */}
@@ -142,7 +185,7 @@ export default function GamePage() {
             MAIN MENU
           </Button>
           <Typography variant="h6" color="#30cfd0" fontWeight="bold">
-            COSMIC SNAKE
+            COSMIC TRACER
           </Typography>
         </Box>
 
@@ -150,7 +193,55 @@ export default function GamePage() {
           <Grid item xs={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h6" color="#fff">SCORE</Typography>
-              <Typography variant="h4" color="#ff3e9d" sx={{ fontWeight: 'bold' }}>{score}</Typography>
+              <Typography variant="h4" color="#ff3e9d" sx={{ 
+                fontWeight: 'bold'
+              }}>{score}</Typography>
+              {showTimeWarpWarning && (
+                <Typography 
+                  variant="subtitle1" 
+                  sx={{ 
+                    color: '#ff00ff', 
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    animation: 'flash 0.5s infinite',
+                    textShadow: '0 0 8px #ff00ff',
+                    '@keyframes flash': {
+                      '0%': { opacity: 0.7 },
+                      '50%': { opacity: 1 },
+                      '100%': { opacity: 0.7 }
+                    }
+                  }}
+                >
+                  ⚠️ TIME WARP IMMINENT ⚠️
+                </Typography>
+              )}
+              {isTimeWarpActive && (
+                <>
+                  <Typography 
+                    variant="subtitle1" 
+                    sx={{ 
+                      color: '#9932CC', 
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      animation: 'pulse 1.5s infinite',
+                      textShadow: '0 0 8px #9932CC',
+                      '@keyframes pulse': {
+                        '0%': { opacity: 0.7, transform: 'scale(1)' },
+                        '50%': { opacity: 1, transform: 'scale(1.05)' },
+                        '100%': { opacity: 0.7, transform: 'scale(1)' }
+                      }
+                    }}
+                  >
+                    🌀 TIME WARP ACTIVE 🌀
+                  </Typography>
+                  <Typography 
+                    variant="caption" 
+                    sx={{ color: '#9932CC', fontWeight: 'bold' }}
+                  >
+                    {Math.max(0, 15 - (gameTime % 60))} seconds left
+                  </Typography>
+                </>
+              )}
             </Box>
           </Grid>
           
@@ -216,7 +307,7 @@ export default function GamePage() {
         </Grid>
       </Paper>
       
-      {/* Game Controls Legend (only show when not playing) */}
+      {/* Game Controls Legend (only show when not playing) - MOVED HERE */}
       {(!gameStarted || isPaused) && !gameOver && (
         <Paper 
           elevation={3} 
@@ -238,7 +329,7 @@ export default function GamePage() {
               <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
                 WASD / Arrows
               </Paper>
-              <Typography variant="caption" color="#ccc">Move Snake</Typography>
+              <Typography variant="caption" color="#ccc">Pilot Spaceship</Typography>
             </Grid>
             <Grid item xs={3}>
               <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
@@ -247,16 +338,16 @@ export default function GamePage() {
               <Typography variant="caption" color="#ccc">Pause/Resume</Typography>
             </Grid>
             <Grid item xs={3}>
-              <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
-                Spacebar
+              <Paper sx={{ p: 1, bgcolor: 'rgba(0, 255, 255, 0.1)', color: '#00ffff' }}>
+                ⭐ Power-Up
               </Paper>
-              <Typography variant="caption" color="#ccc">Restart (Game Over)</Typography>
+              <Typography variant="caption" color="#ccc">Reset Length (+100 pts)</Typography>
             </Grid>
             <Grid item xs={3}>
-              <Paper sx={{ p: 1, bgcolor: 'rgba(255, 62, 157, 0.1)', color: '#ff3e9d' }}>
-                Walls/Self
+              <Paper sx={{ p: 1, bgcolor: 'rgba(153, 50, 204, 0.1)', color: '#9932CC' }}>
+                🌀 Time Warp
               </Paper>
-              <Typography variant="caption" color="#ccc">Game Over</Typography>
+              <Typography variant="caption" color="#ccc">Every Minute (15s)</Typography>
             </Grid>
           </Grid>
         </Paper>
@@ -287,6 +378,7 @@ export default function GamePage() {
             score={score}
             resetGame={startGame}
             gameTime={gameTime}
+            isTimeWarpActive={isTimeWarpActive}
           />
         )}
         
@@ -307,13 +399,31 @@ export default function GamePage() {
             }}
           >
             <Typography variant="h4" color="#30cfd0" sx={{ mb: 2, fontWeight: 'bold' }}>
-              COSMIC SNAKE
+              COSMIC TRACER
             </Typography>
-            <Typography variant="body1" color="#fff" align="center" sx={{ mb: 3, maxWidth: '80%' }}>
-              Navigate through space as you control your cosmic snake.<br/>
-              Collect energy orbs to grow longer and increase your score.<br/>
-              Avoid collisions with walls and yourself!
+            <Typography variant="body1" color="#fff" align="center" sx={{ mb: 2, maxWidth: '80%' }}>
+              Navigate through space as you control your cosmic spaceship.<br/>
+              Collect energy orbs to grow your ship's trail and increase your score.<br/>
+              Look for special star power-ups to reset your trail length and gain bonus points!<br/>
+              Avoid collisions with walls and your own trail!
             </Typography>
+            <Box sx={{ 
+              mb: 3, 
+              p: 2, 
+              bgcolor: 'rgba(153, 50, 204, 0.2)', 
+              borderRadius: '8px',
+              border: '1px solid #9932CC',
+              maxWidth: '80%'
+            }}>
+              <Typography variant="body1" color="#fff" align="center" sx={{ fontWeight: 'bold' }}>
+                <span role="img" aria-label="time warp">🌀</span> TIME WARP CYCLE <span role="img" aria-label="time warp">🌀</span>
+              </Typography>
+              <Typography variant="body2" color="#fff" align="center">
+                Every minute, a cosmic time warp will slow down time for 15 seconds.<br/>
+                Watch for the warning 2 seconds before each warp!<br/>
+                Use this cosmic phenomenon to your advantage when navigating tight spaces.
+              </Typography>
+            </Box>
             <Button 
               variant="contained" 
               onClick={startGame}
@@ -466,7 +576,7 @@ export default function GamePage() {
       
       {/* Footer */}
       <Typography variant="caption" color="#777" sx={{ mt: 2 }}>
-        © 2025 Cosmic Snake Game - Created as part of CIS-376
+        © 2025 Cosmic Tracer - Created as part of CIS-376
       </Typography>
     </Box>
   );

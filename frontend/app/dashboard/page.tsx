@@ -210,7 +210,7 @@ export default function Page() {
                 width: '100%'
               }}>
                 <Typography variant="h1" sx={{ color: '#30cfd0', fontWeight: 'bold', fontSize: { xs: '3rem', md: '5rem' } }}>
-                  SNAKE
+                  TRACER
                 </Typography>
                 <Typography variant="h6" sx={{ color: '#fff', mt: -1 }}>
                   COSMIC EDITION
