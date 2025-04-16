@@ -18,6 +18,8 @@ export default function GamePage() {
   const [gameOver, setGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [gameTime, setGameTime] = useState(0); // Timer in seconds
+  const timerRef = useRef(null); // To hold the timer interval
   
   // Check for client-side rendering and load high score
   useEffect(() => {
@@ -29,6 +31,33 @@ export default function GamePage() {
       setHighScore(parseInt(savedHighScore, 10));
     }
   }, []);
+  
+  // Timer logic
+  useEffect(() => {
+    // Start timer when game starts
+    if (gameStarted && !isPaused && !gameOver) {
+      timerRef.current = setInterval(() => {
+        setGameTime(prevTime => prevTime + 1);
+      }, 1000); // Update every second
+    }
+    
+    // Pause or stop timer
+    if (isPaused || gameOver || !gameStarted) {
+      clearInterval(timerRef.current);
+    }
+    
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(timerRef.current);
+    };
+  }, [gameStarted, isPaused, gameOver]);
+  
+  // Format time for display (mm:ss)
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
+    const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  };
   
   // Update high score when game ends
   useEffect(() => {
@@ -43,6 +72,7 @@ export default function GamePage() {
     if (!isClient) return;
     
     setScore(0);
+    setGameTime(0); // Reset timer
     setGameStarted(true);
     setGameOver(false);
     setIsPaused(false);
@@ -55,6 +85,7 @@ export default function GamePage() {
     setGameStarted(false);
     setGameOver(false);
     setScore(0);
+    setGameTime(0); // Reset timer
     setIsPaused(false);
   };
   
@@ -114,21 +145,28 @@ export default function GamePage() {
         </Box>
 
         <Grid container alignItems="center" spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h6" color="#fff">SCORE</Typography>
               <Typography variant="h4" color="#ff3e9d" sx={{ fontWeight: 'bold' }}>{score}</Typography>
             </Box>
           </Grid>
           
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h6" color="#fff">HIGH SCORE</Typography>
               <Typography variant="h4" color="#30cfd0" sx={{ fontWeight: 'bold' }}>{highScore}</Typography>
             </Box>
           </Grid>
           
-          <Grid item xs={4}>
+          <Grid item xs={3}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Typography variant="h6" color="#fff">TIME</Typography>
+              <Typography variant="h4" color="#8A2BE2" sx={{ fontWeight: 'bold' }}>{formatTime(gameTime)}</Typography>
+            </Box>
+          </Grid>
+          
+          <Grid item xs={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
               {gameStarted && !gameOver ? (
                 <Button 
@@ -246,6 +284,7 @@ export default function GamePage() {
             setGameOver={handleGameOver}
             score={score}
             resetGame={startGame}
+            gameTime={gameTime}
           />
         )}
         
@@ -312,6 +351,9 @@ export default function GamePage() {
             <Typography variant="h6" color="#30cfd0" gutterBottom>
               Current Score: {score}
             </Typography>
+            <Typography variant="h6" color="#8A2BE2" gutterBottom>
+              Time: {formatTime(gameTime)}
+            </Typography>
             <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
               <Button 
                 variant="contained" 
@@ -369,6 +411,9 @@ export default function GamePage() {
               </Typography>
               <Typography variant="h2" color="#30cfd0" sx={{ fontWeight: 'bold', mb: 2 }}>
                 {score}
+              </Typography>
+              <Typography variant="h5" color="#8A2BE2" gutterBottom>
+                TIME: {formatTime(gameTime)}
               </Typography>
               {score >= highScore && score > 0 && (
                 <Box sx={{ bgcolor: 'rgba(48, 207, 208, 0.2)', p: 1, borderRadius: 1 }}>

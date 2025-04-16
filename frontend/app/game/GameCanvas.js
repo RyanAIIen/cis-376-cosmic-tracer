@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-export default function GameCanvas({ gameStarted, gameOver, isPaused, setScore, togglePause, setGameOver, score, resetGame }) {
+export default function GameCanvas({ gameStarted, gameOver, isPaused, setScore, togglePause, setGameOver, score, resetGame, gameTime }) {
   const canvasRef = useRef(null);
   const requestRef = useRef(null);
   const snakeRef = useRef([]);
@@ -21,6 +21,13 @@ export default function GameCanvas({ gameStarted, gameOver, isPaused, setScore, 
   const CANVAS_WIDTH = GRID_SIZE * GRID_WIDTH;
   const CANVAS_HEIGHT = GRID_SIZE * GRID_HEIGHT;
   const WRAP_AROUND = false; // Set to false to make snake die when hitting walls
+  
+  // Format time for display (mm:ss)
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
+    const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  };
   
   // Initialize canvas
   useEffect(() => {
@@ -367,6 +374,11 @@ export default function GameCanvas({ gameStarted, gameOver, isPaused, setScore, 
       context.fill();
     }
     
+    // Draw time in corner if game is running
+    if (gameStarted && !gameOver && !isPaused) {
+      // Timer display has been removed
+    }
+    
     // Draw game over message
     if (gameOver) {
       context.fillStyle = 'rgba(10, 10, 30, 0.8)';
@@ -379,6 +391,7 @@ export default function GameCanvas({ gameStarted, gameOver, isPaused, setScore, 
       
       context.font = '20px Arial';
       context.fillText(`Score: ${score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+      context.fillText(`Time: ${formatTime(gameTime)}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
     }
     
     // Draw paused message
