@@ -106,7 +106,7 @@ export default function GamePage() {
   return (
     <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', bgcolor: '#050518', minHeight: '100vh' }}>
       <Typography variant="h3" gutterBottom color="#30cfd0" sx={{ fontWeight: 'bold', mb: 3 }}>
-        COSMIC SNAKE
+        COSMIC TRACER
       </Typography>
       
       {/* Game Stats and Controls Dashboard */}
@@ -142,7 +142,7 @@ export default function GamePage() {
             MAIN MENU
           </Button>
           <Typography variant="h6" color="#30cfd0" fontWeight="bold">
-            COSMIC SNAKE
+            COSMIC TRACER
           </Typography>
         </Box>
 
@@ -238,7 +238,7 @@ export default function GamePage() {
               <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
                 WASD / Arrows
               </Paper>
-              <Typography variant="caption" color="#ccc">Move Snake</Typography>
+              <Typography variant="caption" color="#ccc">Pilot Spaceship</Typography>
             </Grid>
             <Grid item xs={3}>
               <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
@@ -307,12 +307,12 @@ export default function GamePage() {
             }}
           >
             <Typography variant="h4" color="#30cfd0" sx={{ mb: 2, fontWeight: 'bold' }}>
-              COSMIC SNAKE
+              COSMIC TRACER
             </Typography>
             <Typography variant="body1" color="#fff" align="center" sx={{ mb: 3, maxWidth: '80%' }}>
-              Navigate through space as you control your cosmic snake.<br/>
-              Collect energy orbs to grow longer and increase your score.<br/>
-              Avoid collisions with walls and yourself!
+              Navigate through space as you control your cosmic spaceship.<br/>
+              Collect energy orbs to grow your ship's trail and increase your score.<br/>
+              Avoid collisions with walls and your own trail!
             </Typography>
             <Button 
               variant="contained" 
@@ -466,7 +466,7 @@ export default function GamePage() {
       
       {/* Footer */}
       <Typography variant="caption" color="#777" sx={{ mt: 2 }}>
-        © 2025 Cosmic Snake Game - Created as part of CIS-376
+        © 2025 Cosmic Tracer - Created as part of CIS-376
       </Typography>
     </Box>
   );

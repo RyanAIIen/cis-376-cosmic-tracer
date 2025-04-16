@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState } from 'react';
 
@@ -330,32 +330,91 @@ export default function GameCanvas({
     snakeRef.current.forEach((segment, index) => {
       // Different color for head
       if (index === 0) {
-        context.fillStyle = '#30cfd0'; // Cyan for head
+        // Draw spaceship head instead of cube
+        const x = segment.x * GRID_SIZE;
+        const y = segment.y * GRID_SIZE;
+        const size = GRID_SIZE;
+        
+        // Save the current context state
+        context.save();
+        
+        // Translate to the center of the grid cell
+        context.translate(x + size/2, y + size/2);
+        
+        // Rotate based on direction
+        let rotation = 0;
+        switch(directionRef.current) {
+          case 'up':
+            rotation = -Math.PI/2;
+            break;
+          case 'down':
+            rotation = Math.PI/2;
+            break;
+          case 'left':
+            rotation = Math.PI;
+            break;
+          case 'right':
+            rotation = 0;
+            break;
+        }
+        context.rotate(rotation);
+        
+        // Draw spaceship
+        context.fillStyle = '#30cfd0'; // Main color
+        context.beginPath();
+        
+        // Spaceship shape (pointing right by default)
+        // Main body
+        context.moveTo(size/2 - 2, 0); // Nose of the ship
+        context.lineTo(-size/4, size/3); // Bottom right
+        context.lineTo(-size/3, 0); // Back center
+        context.lineTo(-size/4, -size/3); // Top right
+        context.closePath();
+        context.fill();
+        
+        // Engine glow
+        context.fillStyle = '#ff3e9d'; // Engine color
+        context.beginPath();
+        context.moveTo(-size/3, 0);
+        context.lineTo(-size/3 - 2, size/4);
+        context.lineTo(-size/2, 0);
+        context.lineTo(-size/3 - 2, -size/4);
+        context.closePath();
+        context.fill();
+        
+        // Cockpit highlight
+        context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        context.beginPath();
+        context.arc(size/8, 0, size/6, 0, Math.PI * 2);
+        context.fill();
+        
+        // Restore the context state
+        context.restore();
       } else {
         // Gradient from cyan to darker blue for the body
         const gradient = 1 - (index / snakeRef.current.length) * 0.7;
         context.fillStyle = `rgba(48, 207, 208, ${gradient})`;
+        
+        // Draw snake segment with rounded corners for better appearance
+        const radius = 4; // Corner radius
+        const x = segment.x * GRID_SIZE + 1;
+        const y = segment.y * GRID_SIZE + 1;
+        const width = GRID_SIZE - 2;
+        const height = GRID_SIZE - 2;
+        
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+        context.closePath();
+        context.fill();
       }
-      
-      // Draw snake segment with rounded corners for better appearance
-      const radius = 4; // Corner radius
-      const x = segment.x * GRID_SIZE + 1;
-      const y = segment.y * GRID_SIZE + 1;
-      const width = GRID_SIZE - 2;
-      const height = GRID_SIZE - 2;
-      
-      context.beginPath();
-      context.moveTo(x + radius, y);
-      context.lineTo(x + width - radius, y);
-      context.quadraticCurveTo(x + width, y, x + width, y + radius);
-      context.lineTo(x + width, y + height - radius);
-      context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-      context.lineTo(x + radius, y + height);
-      context.quadraticCurveTo(x, y + height, x, y + height - radius);
-      context.lineTo(x, y + radius);
-      context.quadraticCurveTo(x, y, x + radius, y);
-      context.closePath();
-      context.fill();
     });
     
     // Draw food
@@ -425,16 +484,16 @@ export default function GameCanvas({
       context.fillStyle = '#fff';
       context.font = '30px Arial';
       context.textAlign = 'center';
-      context.fillText('Snake Game', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 40);
+      context.fillText('Cosmic Tracer', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 40);
       
       context.font = '20px Arial';
       context.fillText('Use WASD or Arrow Keys to move', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       context.fillText('Press Space to pause', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
       
       if (!WRAP_AROUND) {
-        context.fillText('Avoid hitting walls and yourself!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
+        context.fillText('Avoid hitting walls and your trail!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
       } else {
-        context.fillText('You can go through walls but avoid hitting yourself!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
+        context.fillText('You can go through walls but avoid hitting your trail!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
       }
     }
   };
