@@ -325,29 +325,41 @@ export default function GamePage() {
             CONTROLS
           </Typography>
           <Grid container spacing={2} sx={{ textAlign: 'center' }}>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
                 WASD / Arrows
               </Paper>
               <Typography variant="caption" color="#ccc">Pilot Spaceship</Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Paper sx={{ p: 1, bgcolor: 'rgba(48, 207, 208, 0.1)', color: '#30cfd0' }}>
                 Spacebar
               </Paper>
               <Typography variant="caption" color="#ccc">Pause/Resume</Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Paper sx={{ p: 1, bgcolor: 'rgba(0, 255, 255, 0.1)', color: '#00ffff' }}>
                 ⭐ Power-Up
               </Paper>
               <Typography variant="caption" color="#ccc">Reset Length (+100 pts)</Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Paper sx={{ p: 1, bgcolor: 'rgba(153, 50, 204, 0.1)', color: '#9932CC' }}>
                 🌀 Time Warp
               </Paper>
-              <Typography variant="caption" color="#ccc">Every Minute (15s)</Typography>
+              <Typography variant="caption" color="#ccc">Slows Time</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Paper sx={{ p: 1, bgcolor: 'rgba(255, 0, 0, 0.1)', color: '#ff5500' }}>
+                💣 Bombs
+              </Paper>
+              <Typography variant="caption" color="#ccc">Avoid! Game Over</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Paper sx={{ p: 1, bgcolor: 'rgba(255, 62, 157, 0.1)', color: '#ff3e9d' }}>
+                Walls/Self
+              </Paper>
+              <Typography variant="caption" color="#ccc">Game Over</Typography>
             </Grid>
           </Grid>
         </Paper>

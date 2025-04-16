@@ -20,6 +20,7 @@ export default function GameCanvas({
   const foodRef = useRef(null);
   const powerUpRef = useRef(null); // Add reference for power-up
   const powerUpTypeRef = useRef(null); // Type of power-up (reset)
+  const bombsRef = useRef([]); // Array to hold bomb positions
   const directionRef = useRef('right');
   const nextDirectionRef = useRef('right');
   const keysPressed = useRef({});
@@ -37,6 +38,9 @@ export default function GameCanvas({
   const CANVAS_HEIGHT = GRID_SIZE * GRID_HEIGHT;
   const WRAP_AROUND = false; // Set to false to make snake die when hitting walls
   const POWER_UP_CHANCE = 0.01; // 1% chance per update to spawn a power-up when none exists
+  const BOMB_SPAWN_CHANCE = 0.005; // 0.5% chance per update to spawn a bomb
+  const MAX_BOMBS = 3; // Maximum number of bombs that can exist at once
+  const BOMB_LIFETIME = 8000; // Bombs disappear after 8 seconds
   
   // Format time for display (mm:ss)
   const formatTime = (timeInSeconds) => {
@@ -271,6 +275,58 @@ export default function GameCanvas({
     }, 10000);
   };
   
+  // Create a bomb at a random position
+  const createBomb = () => {
+    if (bombsRef.current.length >= MAX_BOMBS) return;
+    
+    let position;
+    let overlapsSnake;
+    let overlapsFood;
+    let overlapsPowerUp;
+    let overlapsBomb;
+    
+    // Keep generating positions until we find one that doesn't overlap with anything
+    do {
+      position = {
+        x: Math.floor(Math.random() * GRID_WIDTH),
+        y: Math.floor(Math.random() * GRID_HEIGHT)
+      };
+      
+      overlapsSnake = snakeRef.current.some(segment => 
+        segment.x === position.x && segment.y === position.y
+      );
+      
+      overlapsFood = foodRef.current && 
+        foodRef.current.x === position.x && 
+        foodRef.current.y === position.y;
+        
+      overlapsPowerUp = powerUpRef.current && 
+        powerUpRef.current.x === position.x && 
+        powerUpRef.current.y === position.y;
+        
+      overlapsBomb = bombsRef.current.some(bomb => 
+        bomb.x === position.x && bomb.y === position.y
+      );
+        
+    } while (overlapsSnake || overlapsFood || overlapsPowerUp || overlapsBomb);
+    
+    // Add the bomb to the bombs array with a timestamp
+    const bomb = {
+      x: position.x,
+      y: position.y,
+      createdAt: Date.now()
+    };
+    
+    bombsRef.current.push(bomb);
+    console.log("Bomb spawned at", position.x, position.y);
+    
+    // Schedule bomb to disappear
+    setTimeout(() => {
+      bombsRef.current = bombsRef.current.filter(b => b !== bomb);
+      console.log("Bomb disappeared");
+    }, BOMB_LIFETIME);
+  };
+  
   // Food collision check
   const isCollidingWithFood = () => {
     if (!foodRef.current) return false;
@@ -340,6 +396,17 @@ export default function GameCanvas({
     // Check for collision with power-up
     const collidesWithPowerUp = powerUpRef.current && head.x === powerUpRef.current.x && head.y === powerUpRef.current.y;
     
+    // Check for collision with bombs
+    const collidesWithBomb = bombsRef.current.some(bomb => 
+      head.x === bomb.x && head.y === bomb.y
+    );
+    
+    if (collidesWithBomb) {
+      // Game over if hitting a bomb
+      endGame();
+      return;
+    }
+    
     // Add new head to the snake
     snakeRef.current.unshift(head);
     
@@ -381,6 +448,11 @@ export default function GameCanvas({
     // Chance to spawn a power-up if none exists
     if (!powerUpRef.current && Math.random() < POWER_UP_CHANCE / 5) {
       createPowerUp();
+    }
+    
+    // Chance to spawn a bomb
+    if (Math.random() < BOMB_SPAWN_CHANCE && bombsRef.current.length < MAX_BOMBS) {
+      createBomb();
     }
   };
   
@@ -688,6 +760,56 @@ export default function GameCanvas({
         context.fillText('R', centerX, centerY);
       }
     }
+    
+    // Draw bombs
+    bombsRef.current.forEach(bomb => {
+      const bombX = bomb.x * GRID_SIZE + GRID_SIZE / 2;
+      const bombY = bomb.y * GRID_SIZE + GRID_SIZE / 2;
+      const bombRadius = GRID_SIZE / 2 - 3;
+      
+      // Calculate pulse based on time remaining (faster pulse as time runs out)
+      const timeElapsed = Date.now() - bomb.createdAt;
+      const timeRemaining = BOMB_LIFETIME - timeElapsed;
+      const pulseSpeed = Math.max(100, 500 - (timeElapsed / 20)); // Pulse faster as time runs out
+      const pulsePhase = (Date.now() % pulseSpeed) / pulseSpeed;
+      
+      // Draw outer circle (red/yellow pulsing)
+      context.beginPath();
+      context.arc(bombX, bombY, bombRadius, 0, Math.PI * 2);
+      
+      // Color shifts from yellow to red as time runs out
+      const redComponent = Math.min(255, 255);
+      const greenComponent = Math.max(0, Math.floor(255 * (timeRemaining / BOMB_LIFETIME)));
+      context.fillStyle = `rgb(${redComponent}, ${greenComponent}, 0)`;
+      context.fill();
+      
+      // Draw bomb fuse
+      context.beginPath();
+      context.moveTo(bombX, bombY - bombRadius);
+      context.quadraticCurveTo(
+        bombX + bombRadius/2, 
+        bombY - bombRadius - 5,
+        bombX + bombRadius/2, 
+        bombY - bombRadius - 8
+      );
+      context.lineWidth = 2;
+      context.strokeStyle = '#888';
+      context.stroke();
+      
+      // Draw spark on the fuse (blinking)
+      if (pulsePhase > 0.5) {
+        context.beginPath();
+        context.arc(
+          bombX + bombRadius/2, 
+          bombY - bombRadius - 8,
+          2,
+          0, 
+          Math.PI * 2
+        );
+        context.fillStyle = '#fff';
+        context.fill();
+      }
+    });
     
     // Draw time in corner if game is running
     if (gameStarted && !gameOver && !isPaused) {
