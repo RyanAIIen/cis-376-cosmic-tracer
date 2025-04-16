@@ -11,34 +11,43 @@ export default function GameCanvas({
   setGameOver,
   score,
   resetGame,
-  setIsDoubleScoreActive,
-  exposeScoreDoubler,
-  gameTime
+  gameTime,
+  isTimeWarpActive
 }) {
   const canvasRef = useRef(null);
   const requestRef = useRef(null);
   const snakeRef = useRef([]);
   const foodRef = useRef(null);
+  const powerUpRef = useRef(null); // Add reference for power-up
+  const powerUpTypeRef = useRef(null); // Type of power-up (reset)
   const directionRef = useRef('right');
   const nextDirectionRef = useRef('right');
   const keysPressed = useRef({});
   const [ctx, setCtx] = useState(null);
   const previousGameOverRef = useRef(false);
+  const growSnake = useRef(false);
   
   // Game configuration
   const GRID_SIZE = 20; // Size of each grid cell in pixels
   const GRID_WIDTH = 40; // Number of cells across
   const GRID_HEIGHT = 30; // Number of cells down
-  const GAME_SPEED = 100; // Base speed (ms)
+  const NORMAL_GAME_SPEED = 100; // Normal speed (ms)
+  const TIME_WARP_GAME_SPEED = 200; // Time warp speed (ms) - slower!
   const CANVAS_WIDTH = GRID_SIZE * GRID_WIDTH;
   const CANVAS_HEIGHT = GRID_SIZE * GRID_HEIGHT;
   const WRAP_AROUND = false; // Set to false to make snake die when hitting walls
+  const POWER_UP_CHANCE = 0.01; // 1% chance per update to spawn a power-up when none exists
   
   // Format time for display (mm:ss)
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
     const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
     return `${minutes}:${seconds}`;
+  };
+  
+  // Get current game speed based on time warp status
+  const getCurrentGameSpeed = () => {
+    return isTimeWarpActive ? TIME_WARP_GAME_SPEED : NORMAL_GAME_SPEED;
   };
   
   // Initialize canvas
@@ -149,7 +158,8 @@ export default function GameCanvas({
         
         const elapsed = timestamp - lastUpdateTime;
         
-        if (elapsed > GAME_SPEED) {
+        // Use dynamic game speed based on time warp status
+        if (elapsed > getCurrentGameSpeed()) {
           lastUpdateTime = timestamp;
           updateGame();
           drawGame(ctx);
@@ -170,7 +180,7 @@ export default function GameCanvas({
     return () => {
       cancelAnimationFrame(requestRef.current);
     };
-  }, [ctx, gameStarted, gameOver, isPaused]);
+  }, [ctx, gameStarted, gameOver, isPaused, isTimeWarpActive]);
   
   // Initialize game
   const initializeGame = () => {
@@ -213,6 +223,59 @@ export default function GameCanvas({
     } while (overlapsSnake);
     
     foodRef.current = position;
+    
+    // Chance to spawn a power-up if none exists
+    if (!powerUpRef.current && Math.random() < POWER_UP_CHANCE) {
+      createPowerUp();
+    }
+  };
+  
+  // Create a power-up at a random position
+  const createPowerUp = () => {
+    let position;
+    let overlapsSnake;
+    let overlapsFood;
+    
+    // Keep generating positions until we find one that doesn't overlap with the snake or food
+    do {
+      position = {
+        x: Math.floor(Math.random() * GRID_WIDTH),
+        y: Math.floor(Math.random() * GRID_HEIGHT)
+      };
+      
+      overlapsSnake = snakeRef.current.some(segment => 
+        segment.x === position.x && segment.y === position.y
+      );
+      
+      overlapsFood = foodRef.current && 
+        foodRef.current.x === position.x && 
+        foodRef.current.y === position.y;
+        
+    } while (overlapsSnake || overlapsFood);
+    
+    powerUpRef.current = position;
+    powerUpTypeRef.current = 'reset'; // Currently only have reset type
+    
+    console.log("Power-up spawned: Reset Length");
+    
+    // Power-ups disappear after 10 seconds
+    setTimeout(() => {
+      if (powerUpRef.current) {
+        powerUpRef.current = null;
+        console.log("Power-up disappeared");
+      }
+    }, 10000);
+  };
+  
+  // Food collision check
+  const isCollidingWithFood = () => {
+    if (!foodRef.current) return false;
+    
+    const snakeHead = snakeRef.current[0];
+    return (
+      snakeHead.x === foodRef.current.x &&
+      snakeHead.y === foodRef.current.y
+    );
   };
   
   // Update game state
@@ -270,22 +333,51 @@ export default function GameCanvas({
     // Check for collision with food
     const collidesWithFood = foodRef.current && head.x === foodRef.current.x && head.y === foodRef.current.y;
     
-    // Create new snake array with new head at the front
-    const newSnake = [head, ...snakeRef.current];
+    // Check for collision with power-up
+    const collidesWithPowerUp = powerUpRef.current && head.x === powerUpRef.current.x && head.y === powerUpRef.current.y;
     
+    // Add new head to the snake
+    snakeRef.current.unshift(head);
+    
+    // Process food collision
     if (collidesWithFood) {
-      // Increase score
-      setScore(prevScore => prevScore + 10);
+      // Add points for collecting food
+      const pointsToAdd = 10; // Always 10 points
       
-      // Create new food
+      console.log(`Food collected! Adding ${pointsToAdd} points to score`);
+      
+      // Update score
+      setScore(prevScore => {
+        const newScore = prevScore + pointsToAdd;
+        console.log(`Score updated from ${prevScore} to ${newScore}`);
+        return newScore;
+      });
+      
+      // Create new food (snake grows by keeping tail - don't remove last segment)
       createFood();
+    } else if (collidesWithPowerUp && powerUpTypeRef.current === 'reset') {
+      // Handle reset power-up collision
+      console.log("RESET POWER-UP ACTIVATED!");
+      
+      // Add bonus points for collecting power-up (100 points)
+      setScore(prevScore => prevScore + 100);
+      
+      // Reset snake to 3 segments (head + 2)
+      while (snakeRef.current.length > 3) {
+        snakeRef.current.pop();
+      }
+      
+      // Clear the power-up
+      powerUpRef.current = null;
     } else {
-      // Remove the tail if we didn't eat food
-      newSnake.pop();
+      // Remove the tail if no food was eaten
+      snakeRef.current.pop();
     }
     
-    // Update snake
-    snakeRef.current = newSnake;
+    // Chance to spawn a power-up if none exists
+    if (!powerUpRef.current && Math.random() < POWER_UP_CHANCE / 5) {
+      createPowerUp();
+    }
   };
   
   // End the game
@@ -302,8 +394,44 @@ export default function GameCanvas({
     // Clear canvas
     context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
-    // Draw background
-    context.fillStyle = '#0a0a1e';
+    // Draw background - add time warp visual effect
+    if (isTimeWarpActive) {
+      // Create time warp background effect
+      const gradient = context.createRadialGradient(
+        CANVAS_WIDTH / 2, 
+        CANVAS_HEIGHT / 2, 
+        50, 
+        CANVAS_WIDTH / 2, 
+        CANVAS_HEIGHT / 2, 
+        CANVAS_WIDTH / 1.5
+      );
+      gradient.addColorStop(0, '#1a0033');
+      gradient.addColorStop(1, '#0a0a1e');
+      context.fillStyle = gradient;
+      
+      // Add subtle swirl patterns
+      const time = Date.now() / 5000;
+      for (let i = 0; i < 5; i++) {
+        context.beginPath();
+        const radius = 100 + i * 80;
+        const startAngle = (time + i * 0.2) % (Math.PI * 2);
+        const endAngle = startAngle + Math.PI;
+        context.arc(
+          CANVAS_WIDTH / 2, 
+          CANVAS_HEIGHT / 2, 
+          radius, 
+          startAngle, 
+          endAngle
+        );
+        context.strokeStyle = `rgba(153, 50, 204, ${0.1 - i * 0.015})`;
+        context.lineWidth = 8;
+        context.stroke();
+      }
+    } else {
+      // Normal background
+      context.fillStyle = '#0a0a1e';
+    }
+    
     context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
     // Draw grid (optional)
@@ -360,7 +488,7 @@ export default function GameCanvas({
         context.rotate(rotation);
         
         // Draw spaceship
-        context.fillStyle = '#30cfd0'; // Main color
+        context.fillStyle = isTimeWarpActive ? '#9932CC' : '#30cfd0'; // Purple during time warp
         context.beginPath();
         
         // Spaceship shape (pointing right by default)
@@ -373,14 +501,36 @@ export default function GameCanvas({
         context.fill();
         
         // Engine glow
-        context.fillStyle = '#ff3e9d'; // Engine color
+        context.fillStyle = isTimeWarpActive ? '#cc00cc' : '#ff3e9d'; // Different engine color during time warp
         context.beginPath();
+        
+        // Engine flame
         context.moveTo(-size/3, 0);
         context.lineTo(-size/3 - 2, size/4);
         context.lineTo(-size/2, 0);
         context.lineTo(-size/3 - 2, -size/4);
         context.closePath();
         context.fill();
+        
+        // Add time warp trail effect
+        if (isTimeWarpActive) {
+          // Add motion blur / time echo effect
+          context.globalAlpha = 0.3;
+          for (let i = 1; i <= 3; i++) {
+            const echo = i * 3;
+            
+            // Draw echo of the ship
+            context.fillStyle = `rgba(153, 50, 204, ${0.3 - i * 0.07})`;
+            context.beginPath();
+            context.moveTo(size/2 - 2 - echo, 0);
+            context.lineTo(-size/4 - echo, size/3);
+            context.lineTo(-size/3 - echo, 0);
+            context.lineTo(-size/4 - echo, -size/3);
+            context.closePath();
+            context.fill();
+          }
+          context.globalAlpha = 1.0;
+        }
         
         // Cockpit highlight
         context.fillStyle = 'rgba(255, 255, 255, 0.7)';
@@ -391,9 +541,32 @@ export default function GameCanvas({
         // Restore the context state
         context.restore();
       } else {
-        // Gradient from cyan to darker blue for the body
-        const gradient = 1 - (index / snakeRef.current.length) * 0.7;
-        context.fillStyle = `rgba(48, 207, 208, ${gradient})`;
+        // Rainbow colors for the body, with time warp effect
+        // Define rainbow colors - shift to purples during time warp
+        const rainbowColors = isTimeWarpActive 
+          ? [
+              '#8A2BE2', // Blue Violet
+              '#9932CC', // Dark Orchid
+              '#BA55D3', // Medium Orchid
+              '#DA70D6', // Orchid
+              '#EE82EE', // Violet
+              '#FF00FF', // Magenta
+              '#C71585'  // Medium Violet Red
+            ]
+          : [
+              '#FF0000', // Red
+              '#FF7F00', // Orange
+              '#FFFF00', // Yellow
+              '#00FF00', // Green
+              '#0000FF', // Blue
+              '#4B0082', // Indigo
+              '#9400D3'  // Violet
+            ];
+        
+        // Calculate color index based on segment position and time for animation
+        const timeMultiplier = isTimeWarpActive ? 75 : 150; // Slower color cycling during time warp
+        const colorIndex = (index + Math.floor(Date.now() / timeMultiplier)) % rainbowColors.length;
+        context.fillStyle = rainbowColors[colorIndex];
         
         // Draw snake segment with rounded corners for better appearance
         const radius = 4; // Corner radius
@@ -414,35 +587,102 @@ export default function GameCanvas({
         context.quadraticCurveTo(x, y, x + radius, y);
         context.closePath();
         context.fill();
+        
+        // Add time warp echo/blur effect to segments
+        if (isTimeWarpActive && index < 5) { // Only for first few segments for performance
+          context.globalAlpha = 0.3 - (index * 0.05);
+          context.fillStyle = '#9932CC';
+          context.beginPath();
+          context.moveTo(x + radius + 2, y - 1);
+          context.lineTo(x + width - radius + 2, y - 1);
+          context.quadraticCurveTo(x + width + 2, y - 1, x + width + 2, y + radius - 1);
+          context.lineTo(x + width + 2, y + height - radius - 1);
+          context.quadraticCurveTo(x + width + 2, y + height - 1, x + width - radius + 2, y + height - 1);
+          context.lineTo(x + radius + 2, y + height - 1);
+          context.quadraticCurveTo(x + 2, y + height - 1, x + 2, y + height - radius - 1);
+          context.lineTo(x + 2, y + radius - 1);
+          context.quadraticCurveTo(x + 2, y - 1, x + radius + 2, y - 1);
+          context.closePath();
+          context.fill();
+          context.globalAlpha = 1.0;
+        }
       }
     });
     
-    // Draw food
+    // Draw food with time warp effect
     if (foodRef.current) {
-      context.fillStyle = '#ff3e9d'; // Pink for food
+      const foodX = foodRef.current.x * GRID_SIZE + GRID_SIZE / 2;
+      const foodY = foodRef.current.y * GRID_SIZE + GRID_SIZE / 2;
+      const foodRadius = GRID_SIZE / 2 - 2;
       
-      // Draw food as a circle
+      // Draw food with time warp pulse effect
+      if (isTimeWarpActive) {
+        // Pulsing glow
+        const pulseSize = (Math.sin(Date.now() / 200) + 1) * 3;
+        context.beginPath();
+        context.arc(foodX, foodY, foodRadius + pulseSize, 0, Math.PI * 2);
+        context.fillStyle = 'rgba(153, 50, 204, 0.3)';
+        context.fill();
+      }
+      
+      // Main food circle
+      context.fillStyle = isTimeWarpActive ? '#cc00cc' : '#ff3e9d'; // Different color during time warp
       context.beginPath();
-      context.arc(
-        foodRef.current.x * GRID_SIZE + GRID_SIZE / 2,
-        foodRef.current.y * GRID_SIZE + GRID_SIZE / 2,
-        GRID_SIZE / 2 - 2,
-        0,
-        Math.PI * 2
-      );
+      context.arc(foodX, foodY, foodRadius, 0, Math.PI * 2);
       context.fill();
       
       // Add a small white highlight to make food look better
       context.fillStyle = 'rgba(255, 255, 255, 0.7)';
       context.beginPath();
-      context.arc(
-        foodRef.current.x * GRID_SIZE + GRID_SIZE / 2 - 2,
-        foodRef.current.y * GRID_SIZE + GRID_SIZE / 2 - 2,
-        2,
-        0,
-        Math.PI * 2
-      );
+      context.arc(foodX - 2, foodY - 2, 2, 0, Math.PI * 2);
       context.fill();
+    }
+    
+    // Draw power-up (if exists)
+    if (powerUpRef.current) {
+      if (powerUpTypeRef.current === 'reset') {
+        // Draw reset power-up (flashing light blue and white)
+        const pulseRate = Date.now() % 1000 / 1000; // Value between 0 and 1
+        const pulseColor = pulseRate > 0.5 ? '#ffffff' : '#00ffff';
+        
+        context.fillStyle = pulseColor;
+        
+        // Draw as a star shape
+        const centerX = powerUpRef.current.x * GRID_SIZE + GRID_SIZE / 2;
+        const centerY = powerUpRef.current.y * GRID_SIZE + GRID_SIZE / 2;
+        const outerRadius = GRID_SIZE / 2 - 1;
+        const innerRadius = outerRadius / 2;
+        const spikes = 5;
+        
+        context.beginPath();
+        for (let i = 0; i < spikes * 2; i++) {
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
+          const angle = (Math.PI / spikes) * i;
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
+          
+          if (i === 0) {
+            context.moveTo(x, y);
+          } else {
+            context.lineTo(x, y);
+          }
+        }
+        context.closePath();
+        context.fill();
+        
+        // Add a pulsing glow effect
+        context.shadowBlur = 10 * pulseRate;
+        context.shadowColor = '#00ffff';
+        context.fill();
+        context.shadowBlur = 0;
+        
+        // Draw a "R" letter in the center
+        context.fillStyle = '#0a0a1e';
+        context.font = '12px Arial';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText('R', centerX, centerY);
+      }
     }
     
     // Draw time in corner if game is running
