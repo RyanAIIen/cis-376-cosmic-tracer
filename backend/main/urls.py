@@ -28,4 +28,5 @@ urlpatterns = [
     path('admin/', admin_site.urls),
     path('', include('djoser.urls')),
     path('', include('users.urls')),
+    path('api/scores/', include('scores.urls')),
 ]

@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     #
     # Cosmic Tracer apps
     'users',
+    'scores',
 ]
 
 MIDDLEWARE = [

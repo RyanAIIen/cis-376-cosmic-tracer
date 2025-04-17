@@ -19,6 +19,10 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the Leaderboard component
+const Leaderboard = dynamic(() => import('../components/Leaderboard'), { ssr: false });
 
 // Mock leaderboard data
 const mockLeaderboard = [
@@ -187,146 +191,11 @@ export default function Page() {
           background: 'linear-gradient(to right, #0a0a1e, #1a103a)',
           border: '1px solid rgba(48, 207, 208, 0.3)',
           boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
+          p: 3,
         }}
       >
-        <Box sx={{ p: 3, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-          <Typography
-            variant='h4'
-            sx={{
-              color: '#30cfd0',
-              fontWeight: 'bold',
-              textAlign: 'center',
-            }}
-          >
-            GLOBAL LEADERBOARD
-          </Typography>
-        </Box>
-
-        <TableContainer>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    bgcolor: 'rgba(10, 10, 30, 0.9)',
-                    color: '#fff',
-                    fontWeight: 'bold',
-                    borderBottom: '2px solid rgba(48, 207, 208, 0.5)',
-                  }}
-                >
-                  RANK
-                </TableCell>
-                <TableCell
-                  sx={{
-                    bgcolor: 'rgba(10, 10, 30, 0.9)',
-                    color: '#fff',
-                    fontWeight: 'bold',
-                    borderBottom: '2px solid rgba(48, 207, 208, 0.5)',
-                  }}
-                >
-                  PLAYER
-                </TableCell>
-                <TableCell
-                  align='right'
-                  sx={{
-                    bgcolor: 'rgba(10, 10, 30, 0.9)',
-                    color: '#fff',
-                    fontWeight: 'bold',
-                    borderBottom: '2px solid rgba(48, 207, 208, 0.5)',
-                  }}
-                >
-                  SCORE
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {leaderboardData.map((player, index) => (
-                <TableRow
-                  key={player.id}
-                  sx={{
-                    '&:nth-of-type(odd)': {
-                      bgcolor:
-                        player.username === 'You'
-                          ? 'rgba(48, 207, 208, 0.1)'
-                          : 'rgba(255, 255, 255, 0.03)',
-                    },
-                    '&:nth-of-type(even)': {
-                      bgcolor:
-                        player.username === 'You'
-                          ? 'rgba(48, 207, 208, 0.1)'
-                          : 'transparent',
-                    },
-                    '&:hover': { bgcolor: 'rgba(48, 207, 208, 0.1)' },
-                    border:
-                      player.username === 'You'
-                        ? '1px solid rgba(48, 207, 208, 0.5)'
-                        : 'none',
-                  }}
-                >
-                  <TableCell
-                    sx={{
-                      color:
-                        index < 3
-                          ? '#ff3e9d'
-                          : player.username === 'You'
-                            ? '#30cfd0'
-                            : '#ccc',
-                      fontWeight:
-                        index < 3 || player.username === 'You'
-                          ? 'bold'
-                          : 'normal',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                    }}
-                  >
-                    {index + 1}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Avatar
-                        sx={{
-                          bgcolor:
-                            index < 3
-                              ? '#ff3e9d'
-                              : player.username === 'You'
-                                ? '#30cfd0'
-                                : '#5390d9',
-                          color: '#fff',
-                          width: 32,
-                          height: 32,
-                        }}
-                      >
-                        {player.avatar}
-                      </Avatar>
-                      <Typography
-                        sx={{
-                          color: player.username === 'You' ? '#30cfd0' : '#fff',
-                          fontWeight:
-                            player.username === 'You' ? 'bold' : 'normal',
-                        }}
-                      >
-                        {player.username}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell
-                    align='right'
-                    sx={{
-                      color: player.username === 'You' ? '#ff3e9d' : '#30cfd0',
-                      fontWeight: 'bold',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                    }}
-                  >
-                    {player.score}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {/* Use the new Leaderboard component */}
+        <Leaderboard />
       </Paper>
     </Container>
   );
