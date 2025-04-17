@@ -41,15 +41,6 @@ const guestNavItems = [
 ];
 
 const authenticatedNavItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
-];
-
-// Always visible navigation items regardless of auth status
-const alwaysVisibleNavItems = [
-  { name: 'Play Game', href: '/game', icon: <SportsEsportsIcon /> },
-];
-
-const userMenu = [
   { name: 'Account', href: '/account', icon: <AccountCircleIcon /> },
   { name: LOG_OUT, icon: <LogoutIcon /> },
 ];
@@ -91,8 +82,8 @@ export default function Navigation() {
   const navItems = isLoading
     ? []
     : isAuthenticated
-      ? [...authenticatedNavItems, ...alwaysVisibleNavItems]
-      : [...guestNavItems, ...alwaysVisibleNavItems];
+      ? authenticatedNavItems
+      : guestNavItems;
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
@@ -253,7 +244,7 @@ export default function Navigation() {
                 </div>
               )}
 
-              {userMenu.map(({ name, icon, href }) => (
+              {authenticatedNavItems.map(({ name, icon, href }) => (
                 <MenuItem
                   key={name}
                   onClick={() => {
