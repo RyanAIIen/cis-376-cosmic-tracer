@@ -166,6 +166,7 @@ export default function GamePage() {
             display: 'grid',
             gridTemplateColumns: '150px 1fr',
             alignItems: 'center',
+            gap: 2,
           }}
         >
           <Box textAlign='center'>
@@ -189,7 +190,7 @@ export default function GamePage() {
             </Button>
           </Box>
 
-          <Box display='flex' justifyContent='center' pr={8}>
+          <Box display='flex' justifyContent='center' pr={10}>
             <Grid container alignItems='center' spacing={2}>
               <Grid item xs={3}>
                 <Box
@@ -299,61 +300,6 @@ export default function GamePage() {
                   >
                     {formatTime(gameTime)}
                   </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={3}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
-                  {gameStarted && !gameOver ? (
-                    <Button
-                      variant='contained'
-                      onClick={togglePause}
-                      sx={{
-                        minWidth: 120,
-                        bgcolor: isPaused ? '#30cfd0' : '#ff3e9d',
-                        '&:hover': {
-                          bgcolor: isPaused ? '#00a0a0' : '#d01c7c',
-                        },
-                      }}
-                    >
-                      {isPaused ? 'RESUME' : 'PAUSE'}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant='contained'
-                      onClick={startGame}
-                      sx={{
-                        minWidth: 120,
-                        bgcolor: '#30cfd0',
-                        '&:hover': { bgcolor: '#00a0a0' },
-                      }}
-                    >
-                      {gameOver ? 'PLAY AGAIN' : 'START GAME'}
-                    </Button>
-                  )}
-
-                  <Button
-                    variant='outlined'
-                    onClick={resetGame}
-                    sx={{
-                      minWidth: 120,
-                      color: '#ff3e9d',
-                      borderColor: '#ff3e9d',
-                      '&:hover': {
-                        borderColor: '#d01c7c',
-                        bgcolor: 'rgba(255, 62, 157, 0.1)',
-                      },
-                    }}
-                  >
-                    RESET
-                  </Button>
                 </Box>
               </Grid>
             </Grid>
@@ -471,7 +417,7 @@ export default function GamePage() {
                   fontSize: '1.2rem',
                 }}
               >
-                START GAME
+                BLAST OFF
               </Button>
             </Box>
           )}

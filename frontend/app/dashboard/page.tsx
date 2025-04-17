@@ -99,7 +99,9 @@ export default function Page() {
           },
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
+          gap: 2,
           justifyContent: 'space-around',
+          alignItems: 'center',
         }}
       >
         <Typography
@@ -140,8 +142,9 @@ export default function Page() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 1,
             maxWidth: 'max-content',
+            gap: 1,
+            mt: 2,
           }}
         >
           <Button
@@ -160,7 +163,7 @@ export default function Page() {
               },
             }}
           >
-            PLAY NOW
+            Let's Go!
           </Button>
 
           <Typography
