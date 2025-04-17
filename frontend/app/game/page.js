@@ -9,6 +9,7 @@ import { Grid, Paper } from '@mui/material';
 import Link from 'next/link';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { RequireAuth } from '../components/utils';
+import { submitScore } from './GameAPI';
 
 // Create a client-side only component for the game canvas
 const GameCanvas = dynamic(() => import('./GameCanvas'), { ssr: false });
@@ -23,6 +24,8 @@ export default function GamePage() {
   const [isTimeWarpActive, setIsTimeWarpActive] = useState(false);
   const [showTimeWarpWarning, setShowTimeWarpWarning] = useState(false);
   const [gameTime, setGameTime] = useState(0);
+  const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const timerRef = useRef(null);
 
   // Check for client-side rendering and load high score
@@ -150,6 +153,42 @@ export default function GamePage() {
 
   const handleGameOver = () => {
     setGameOver(true);
+    setScoreSubmitted(false);
+    setSubmitError(null);
+    
+    // Compare current score with high score
+    const isNewHighScore = score > highScore;
+    const scoreToSubmit = isNewHighScore ? score : highScore;
+    
+    // Update high score if needed
+    if (isNewHighScore) {
+      setHighScore(score);
+      localStorage.setItem('snakeHighScore', score.toString());
+      console.log(`New high score achieved: ${score}`);
+    }
+    
+    // Submit high score to leaderboard if user has a score
+    if (scoreToSubmit > 0) {
+      console.log(`Submitting ${isNewHighScore ? 'new' : 'existing'} high score: ${scoreToSubmit}, Time played: ${gameTime}s`);
+      
+      submitScore(scoreToSubmit, gameTime)
+        .then(response => {
+          if (!response.success) {
+            // Handle specific error cases
+            if (response.error === 'Authentication failed') {
+              setSubmitError('Authentication error. Please refresh the page and log in again.');
+            } else {
+              setSubmitError(response.message || 'Failed to submit score to the server.');
+            }
+          } else {
+            setScoreSubmitted(true);
+          }
+        })
+        .catch(error => {
+          console.error('Error submitting score:', error);
+          setSubmitError('A network error occurred while submitting your score.');
+        });
+    }
   };
 
   return (
@@ -525,11 +564,30 @@ export default function GamePage() {
                 <Typography variant='h5' color='#8A2BE2' gutterBottom>
                   TIME: {formatTime(gameTime)}
                 </Typography>
+                
+                {/* Display high score section */}
+                <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <Typography variant='h6' color='#fff' gutterBottom>
+                    YOUR HIGH SCORE
+                  </Typography>
+                  <Typography
+                    variant='h3'
+                    color='#ff3e9d'
+                    sx={{ fontWeight: 'bold' }}
+                  >
+                    {highScore}
+                  </Typography>
+                  <Typography variant='body2' color='#ccc' sx={{ mt: 1 }}>
+                    Your best score is automatically submitted to the leaderboard
+                  </Typography>
+                </Box>
+                
                 {score >= highScore && score > 0 && (
                   <Box
                     sx={{
                       bgcolor: 'rgba(48, 207, 208, 0.2)',
                       p: 1,
+                      mt: 2,
                       borderRadius: 1,
                     }}
                   >
@@ -574,6 +632,22 @@ export default function GamePage() {
                   MAIN MENU
                 </Button>
               </Box>
+
+              {scoreSubmitted && (
+                <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0, 255, 0, 0.1)', borderRadius: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle1" sx={{ color: '#4caf50' }}>
+                    Your high score has been submitted to the leaderboard!
+                  </Typography>
+                </Box>
+              )}
+              
+              {submitError && (
+                <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(255, 0, 0, 0.1)', borderRadius: 1, textAlign: 'center' }}>
+                  <Typography variant="subtitle1" sx={{ color: '#f44336' }}>
+                    {submitError}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           )}
         </Box>
