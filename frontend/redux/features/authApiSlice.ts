@@ -4,12 +4,13 @@ import { User } from '@/redux/features/types';
 
 interface SocialAuthArgs {
   provider: string;
-  state: string;
   code: string;
+  state?: string;
 }
 
 interface CreateUserResponse {
-  success: boolean;
+  access: string;
+  refresh: string;
   user: User;
 }
 
@@ -20,14 +21,19 @@ const authApiSlice = apiSlice.injectEndpoints({
     }),
 
     socialAuthenticate: builder.mutation<CreateUserResponse, SocialAuthArgs>({
-      query: ({ provider, state, code }) => ({
-        url: `/o/${provider}/?state=${encodeURIComponent(state)}&code=${encodeURIComponent(code)}`,
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }),
+      query: ({ provider, code, state }) => {
+        const queryParams = new URLSearchParams({ code });
+        if (state) queryParams.append('state', state);
+
+        return {
+          url: `/o/${provider}/?${queryParams.toString()}`,
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        };
+      },
     }),
 
     login: builder.mutation({

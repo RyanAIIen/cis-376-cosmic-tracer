@@ -11,7 +11,37 @@ import { FormBox } from '@/app/components/forms';
 import LoginForm from './login-form';
 
 export default function Page() {
-  const continueWithGoogle = async () => {};
+  // const continueWithGoogle = async () => {
+  //   try {
+  //     const redirectUri = `${window.location.origin}/auth/google`;
+
+  //     const res = await fetch(
+  //       `${process.env.NEXT_PUBLIC_API_HOST}/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`,
+  //       {
+  //         method: 'GET',
+  //         headers: {
+  //           Accept: 'application/json',
+  //         },
+  //       },
+  //     );
+
+  //     const data = await res.json();
+  //     const { authorization_url } = data;
+
+  //     const stateFromUrl = new URL(authorization_url).searchParams.get('state');
+  //     if (stateFromUrl) {
+  //       localStorage.setItem('oauth_state', stateFromUrl);
+  //     }
+
+  //     if (authorization_url) {
+  //       window.location.href = authorization_url;
+  //     } else {
+  //       throw new Error('Missing authorization_url in response');
+  //     }
+  //   } catch (err) {
+  //     console.error('OAuth redirect failed:', err);
+  //   }
+  // };
 
   return (
     <FormBox form={<LoginForm />}>
@@ -28,12 +58,13 @@ export default function Page() {
 
         {/* <Divider>or</Divider> */}
 
+        {/* TODO: Add Google auth when feasible */}
         {/* <Button
           onClick={continueWithGoogle}
           startIcon={<GoogleIcon />}
           color='error'
         >
-          Authenticate with Google
+          Sign in with Google
         </Button> */}
       </>
     </FormBox>

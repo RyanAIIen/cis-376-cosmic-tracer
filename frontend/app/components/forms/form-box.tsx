@@ -1,3 +1,4 @@
+import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 
 interface FormBoxProps {
@@ -7,12 +8,12 @@ interface FormBoxProps {
 
 export default function FormBox({ form, children }: FormBoxProps) {
   return (
-    <Box m={-2} mx={-3}>
-      <Box display='flex' flexDirection='column' rowGap={2} p={3}>
+    <Container maxWidth='sm'>
+      <Box display='flex' flexDirection='column' gap={2} p={2}>
         {form}
 
         {children}
       </Box>
-    </Box>
+    </Container>
   );
 }
