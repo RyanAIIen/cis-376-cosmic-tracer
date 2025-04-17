@@ -109,7 +109,6 @@ export default function Navigation() {
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <Logo />
-          {isAuthenticated ? user?.display_name : '???'}
 
           {/* narrow screen */}
           <Box
