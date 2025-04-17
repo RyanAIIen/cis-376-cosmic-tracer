@@ -40,26 +40,23 @@
         box-shadow: 0 2px 5px rgba(255, 0, 204, 0.3);
       }
 
-      .navbar *, .navbar-inverse .navbar-brand {
+      .navbar li a {
         color: #ffccff;
+        text-decoration: none;
         font-weight: 600;
       }
-
-      .navbar a:visited {
+      .navbar li a:visited {
         color: #ffccff;
         text-decoration: none;
       }
 
-      .navbar a:hover {
+      .navbar li a:hover {
         color: #ffeeff;
         transition: all 0.2s ease;
       }
 
       .navbar-nav {
-        margin-top: 8px
-      }
-      .navbar-nav > * {
-        margin-left: 8px
+        margin-top: 16px
       }
 
       header {
@@ -130,8 +127,12 @@
               {% endblock %}
             </span>
             <ul class="nav navbar-nav pull-right">
-              <a href="http://localhost:3000">Play the Game</a>
-              <a href="/admin">Admin Panel</a>
+              <li>
+                <a href="http://localhost:3000">Play the Game</a>
+              </li>
+              <li>
+                <a href="/admin">Admin Panel</a>
+              </li>
 
               {% block userlinks %}
                 {% if user.is_authenticated %}

@@ -26,9 +26,9 @@ export default function GameCanvas({
 
   // Game configuration
   const GRID_SIZE = 25; // Size of each grid cell in pixels
-  const GRID_WIDTH = 30; // Number of cells across
-  const GRID_HEIGHT = 30; // Number of cells down
-  const NORMAL_GAME_SPEED = 75; // Normal speed (ms)
+  const GRID_WIDTH = 25; // Number of cells across
+  const GRID_HEIGHT = 25; // Number of cells down
+  const NORMAL_GAME_SPEED = 68; // Normal speed (ms)
   const TIME_WARP_GAME_SPEED = 200; // Time warp speed (ms, higher value is slower)
   const CANVAS_WIDTH = GRID_SIZE * GRID_WIDTH;
   const CANVAS_HEIGHT = GRID_SIZE * GRID_HEIGHT;
