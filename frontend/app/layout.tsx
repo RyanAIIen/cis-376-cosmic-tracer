@@ -33,14 +33,14 @@ export default function RootLayout({
             <CssBaseline />
             <ThemeProvider theme={theme}>
               <Setup />
-
               <Navigation />
 
-              <Box p={2} px={3} minHeight='85vh' bgcolor='#fffefd'>
-                {children}
+              <Box
+                sx={{ display: 'flex', flexDirection: 'column', gap: 4, p: 2 }}
+              >
+                <Box>{children}</Box>
+                <Footer />
               </Box>
-
-              <Footer />
             </ThemeProvider>
           </AppRouterCacheProvider>
         </ReduxProvider>

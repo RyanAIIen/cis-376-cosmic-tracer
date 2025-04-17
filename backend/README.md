@@ -40,9 +40,10 @@ Run the database migrations to create the database:
 python manage.py migrate
 ```
 
-Then run the built in development server:
+Then collect static files and run the built in development server:
 
 ```sh
+python manage.py collectstatic --noinput
 python manage.py runserver
 ```
 

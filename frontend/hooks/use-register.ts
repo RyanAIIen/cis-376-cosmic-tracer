@@ -30,7 +30,7 @@ export default function useRegister() {
     register(formData)
       .unwrap()
       .then(() => {
-        toast.success(
+        toast.info(
           'Account created. Please check your email to verify the account.',
         );
         router.push('/login');

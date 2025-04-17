@@ -24,7 +24,7 @@ export default function Page({ params }: { params: PageParams }) {
     activation({ uid, token })
       .unwrap()
       .then(() => {
-        toast.success('Account activated. You can now log in.');
+        toast.info('Account activated. You can now log in.');
       })
       .catch((error) => {
         console.error(error.data);

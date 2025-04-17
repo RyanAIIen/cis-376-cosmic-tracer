@@ -20,7 +20,7 @@ export default function useResetPassword() {
     resetPassword(email)
       .unwrap()
       .then(() => {
-        toast.success('Request sent. Check your email for a reset link.');
+        toast.info('Request sent. Check your email for a reset link.');
       })
       .catch((error) => {
         console.error(error.data);

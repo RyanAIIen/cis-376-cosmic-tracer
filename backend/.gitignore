@@ -7,8 +7,6 @@ __pycache__/
 *.log
 *.pyc
 *.sqlite3
-media/
-static/
 venv/
 
 !.env.dev

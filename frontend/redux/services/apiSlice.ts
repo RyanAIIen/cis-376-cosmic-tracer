@@ -6,13 +6,20 @@ import type {
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 
-import { setAuth, logout } from '@/redux/features/authSlice';
+import { setAuthenticated, logout } from '@/redux/features/authSlice';
 
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${process.env.NEXT_PUBLIC_API_HOST}`,
   credentials: 'include',
+  prepareHeaders: (headers) => {
+    const token = localStorage.getItem('access');
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
 });
 
 const baseQueryWithReauth: BaseQueryFn<
@@ -31,13 +38,14 @@ const baseQueryWithReauth: BaseQueryFn<
           {
             url: '/jwt/refresh/',
             method: 'POST',
+            body: { refresh: localStorage.getItem('refresh') },
           },
           api,
           extraOptions,
         );
 
         if (refreshResult.data) {
-          api.dispatch(setAuth());
+          api.dispatch(setAuthenticated());
           result = await baseQuery(args, api, extraOptions);
         } else {
           api.dispatch(logout());

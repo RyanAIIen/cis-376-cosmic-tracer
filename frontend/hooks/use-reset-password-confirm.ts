@@ -28,7 +28,7 @@ export default function useRegister(uid: string, token: string) {
     resetPasswordConfirm({ uid, token, new_password, re_new_password })
       .unwrap()
       .then(() => {
-        toast.success('Password reset successful. Please log in.');
+        toast.info('Password reset successful. Please log in.');
         router.push('/login');
       })
       .catch((error) => {
