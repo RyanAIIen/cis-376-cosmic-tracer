@@ -63,13 +63,14 @@ const Logo = ({ sx }: { sx: LinkProps['sx'] }) => (
         width={40}
         height={40}
       />
+
       <Typography
         variant='h1'
-        fontSize='1.5rem'
         sx={{
-          color: '#222',
-          '@media (prefers-color-scheme: dark)': { color: 'white' },
-          pt: '4px', // text vertical center offset
+          fontWeight: 'bold',
+          background: 'linear-gradient(45deg, #2BBAD0 30%, #ff3e9d 90%)',
+          backgroundClip: 'text',
+          textFillColor: 'transparent',
         }}
       >
         Cosmic Tracer
@@ -131,7 +132,6 @@ export default function Navigation() {
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <Logo sx={{ display: { xs: 'none', md: 'flex' } }} />
-
           <Box
             sx={{
               flexGrow: 1,
@@ -180,9 +180,7 @@ export default function Navigation() {
               ))}
             </Menu>
           </Box>
-
           <Logo sx={{ display: { xs: 'flex', md: 'none' }, mr: 3 }} />
-
           <Box
             sx={{
               flexGrow: 1,
@@ -211,7 +209,6 @@ export default function Navigation() {
               </Button>
             ))}
           </Box>
-
           <Box sx={{ flexGrow: 0 }}>
             {isAuthenticated && (
               <Tooltip title='Open settings'>
