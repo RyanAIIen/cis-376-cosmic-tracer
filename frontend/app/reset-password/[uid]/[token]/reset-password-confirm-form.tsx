@@ -51,7 +51,7 @@ export default function PasswordResetConfirmForm({
 
   return (
     <Form
-      header='Choose a new password.'
+      header='Choose a new password'
       inputs={inputs}
       isLoading={isLoading}
       submitText='Set new password'

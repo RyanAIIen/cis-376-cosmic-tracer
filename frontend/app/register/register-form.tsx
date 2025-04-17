@@ -76,7 +76,7 @@ export default function RegisterForm() {
 
   return (
     <Form
-      header='Create an account.'
+      header='Create an account'
       inputs={inputs}
       isLoading={isLoading}
       submitText='Register'

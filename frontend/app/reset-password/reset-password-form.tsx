@@ -28,7 +28,7 @@ export default function ResetPasswordForm() {
 
   return (
     <Form
-      header='Reset your password.'
+      header='Reset your password'
       inputs={inputs}
       isLoading={isLoading}
       submitText='Reset'

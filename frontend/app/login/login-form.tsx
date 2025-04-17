@@ -43,7 +43,7 @@ export default function LoginForm() {
 
   return (
     <Form
-      header='Log in.'
+      header='Log in'
       inputs={inputs}
       isLoading={isLoading}
       submitText='Login'
