@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: ci_db
+          POSTGRES_USER: ci_db_user
+          POSTGRES_PASSWORD: ci_db_pw
         ports:
           - 5432:5432
         options: >-
