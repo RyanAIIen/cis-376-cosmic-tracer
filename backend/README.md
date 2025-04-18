@@ -60,6 +60,14 @@ AUTH_SUPERUSER_PASSWORD='goblue!'
 These values and all other environment variables can be modified in
 the `.env.dev` file.
 
+## Testing
+
+To run the unit tests, call:
+
+```sh
+python manage.py test
+```
+
 ## Learning Resources
 
 To learn more about the project tools, take a look at the following resources:
