@@ -29,9 +29,9 @@ jobs:
       DJANGO_SETTINGS_MODULE: main.settings
       DEBUG: "False"
       SECRET_KEY: dummykey
-      POSTGRES_DB: test_db
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: ci_db
+      POSTGRES_USER: ci_db_user
+      POSTGRES_PASSWORD: ci_db_pw
       POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
 
