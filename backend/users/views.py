@@ -1,6 +1,6 @@
 from django.conf import settings
 from djoser.social.views import ProviderAuthView as DefaultProviderAuthView
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import (
@@ -45,7 +45,9 @@ class TokenRefreshView(DefaultTokenRefreshView):
         refresh_token = request.COOKIES.get('refresh')
 
         if refresh_token:
-            request.data['refresh'] = refresh_token
+            mutable_data = request.data.copy()
+            mutable_data['refresh'] = refresh_token
+            request._full_data = mutable_data
 
         response = super().post(request, *args, **kwargs)
 
@@ -70,17 +72,20 @@ class TokenVerifyView(DefaultTokenVerifyView):
         access_token = request.COOKIES.get('access')
 
         if access_token:
-            request.data['token'] = access_token
+            mutable_data = request.data.copy()
+            mutable_data['token'] = access_token
+            request._full_data = mutable_data
 
         return super().post(request, *args, **kwargs)
 
 
 class LogoutView(APIView):
-    def post(self, request, *args, **kwargs):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
         response = Response(status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie('access')
         response.delete_cookie('refresh')
-
         return response
 
 
